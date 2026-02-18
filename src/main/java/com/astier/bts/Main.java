@@ -29,8 +29,7 @@ public class Main {
 
 
         System.out.println("""
-                Vous informations à coder svp:             
-                """);
+                Vous informations à coder svp:             """);
         String data = sc.nextLine();
 
         //
@@ -40,29 +39,28 @@ public class Main {
         System.out.println(new String(bytesFromAES, StandardCharsets.UTF_8));
         System.out.println("Encoder");
         for (byte b : bytesToAES) {
-            System.out.printf("%02X ", b);  // %02X pour afficher deux chiffres avec un z?ro initial si n?cessaire
+            System.out.printf("%02X ", b);
         }
         System.out.println("\nDécoder");
         for (byte b : bytesFromAES) {
-            System.out.printf("%02X ", b);  // %02X pour afficher deux chiffres avec un z?ro initial si n?cessaire
+            System.out.printf("%02X ", b);
         }
 
 
         System.out.println("""
                 
-                #####################################CBC###############################             
-                """);
+                #####################################CBC###############################             """);
         bytesToAES = aesCbc.cryptage(data.getBytes(StandardCharsets.UTF_8));
         System.out.println(new String(bytesToAES, StandardCharsets.UTF_8)+"\n");
         bytesFromAES= aesCbc.decryptage(bytesToAES);
         System.out.println(new String(bytesFromAES, StandardCharsets.UTF_8));
         System.out.println("Encoder");
         for (byte b : bytesToAES) {
-            System.out.printf("%02X ", b);  // %02X pour afficher deux chiffres avec un z?ro initial si n?cessaire
+            System.out.printf("%02X ", b);
         }
         System.out.println("\nDécoder");
         for (byte b : bytesFromAES) {
-            System.out.printf("%02X ", b);  // %02X pour afficher deux chiffres avec un z?ro initial si n?cessaire
+            System.out.printf("%02X ", b);
         }
 
         while (!sc.nextLine().equalsIgnoreCase("exit")){

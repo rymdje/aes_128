@@ -1,26 +1,11 @@
 plugins {
     id("java")
-    //générer jar avec dépendences
-    id ("com.github.johnrengelman.shadow") version "8.1.1"
-    //générer un exe à partir du jar
+    id("org.openjfx.javafxplugin") version "0.0.13"
+
+    id("com.github.johnrengelman.shadow") version "8.1.1"
     id("edu.sc.seis.launch4j") version "3.0.6"
 }
-tasks {
-    shadowJar {
-        archiveClassifier.set("") // Configure le JAR pour ne pas avoir de suffixe
-        manifest {
-            attributes["Main-Class"] = "com.astier.bts.Main" // Classe principale de l'application
-        }
-    }
-    launch4j {
-        outfile.set("AES.exe")
-        mainClassName.set("com.astier.bts.Main")
-        headerType.set("console")
-        setJarTask(project.tasks.shadowJar.get())
-        icon.set("${projectDir}/icons/aes.ico")
-    }
 
-}
 group = "com.astier.bts"
 version = "1.0-SNAPSHOT"
 
@@ -28,15 +13,41 @@ repositories {
     mavenCentral()
 }
 
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(23))
+    }
+}
+
+javafx {
+    version = "23"
+    modules = listOf("javafx.controls", "javafx.fxml")
+}
+
 dependencies {
-    //Gson
-    implementation("com.google.code.gson:gson:2.10.1")
-// + tes libs JavaFX
-    implementation ("com.google.code.gson:gson:2.11.0")
+    implementation("com.google.code.gson:gson:2.11.0")
+
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
 }
 
 tasks.test {
     useJUnitPlatform()
+}
+
+tasks {
+    shadowJar {
+        archiveClassifier.set("")
+        manifest {
+            attributes["Main-Class"] = "com.astier.bts.Main"
+        }
+    }
+
+    launch4j {
+        outfile.set("AES.exe")
+        mainClassName.set("com.astier.bts.Main")
+        headerType.set("console")
+        setJarTask(project.tasks.shadowJar.get())
+        icon.set("${projectDir}/icons/aes.ico")
+    }
 }

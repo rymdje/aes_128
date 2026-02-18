@@ -1,7 +1,6 @@
 package com.astier.bts.tcp;
 
 import com.astier.bts.client_tcp_prof.crypto.CryptoClient;
-import com.astier.bts.client_tcp_prof.tcp.TCP;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
@@ -16,31 +15,40 @@ import static javafx.scene.paint.Color.LIME;
 import static javafx.scene.paint.Color.RED;
 
 public class HelloController implements Initializable {
+
     public Button button;
     public Button connecter;
     public Button deconnecter;
+
     public TextField TextFieldIP;
     public TextField TextFieldPort;
     public TextField TextFieldRequette;
+
     public Circle voyant;
     public TextArea TextAreaReponses;
 
     public static TCP tcp;
     public static boolean enRun = false;
-    String adresse, port;
+
+    private String adresse, port;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         voyant.setFill(RED);
 
         button.setOnMouseClicked(e -> {
-            try { envoyer(); } catch (Exception ex) { TextAreaReponses.appendText(ex+"\n"); }
+            try { envoyer(); }
+            catch (Exception ex) { TextAreaReponses.appendText(ex + "\n"); }
         });
+
         connecter.setOnMouseClicked(e -> {
-            try { connecter(); } catch (Exception ex) { TextAreaReponses.appendText(ex+"\n"); }
+            try { connecter(); }
+            catch (Exception ex) { TextAreaReponses.appendText(ex + "\n"); }
         });
+
         deconnecter.setOnMouseClicked(e -> {
-            try { deconnecter(); } catch (Exception ex) { TextAreaReponses.appendText(ex+"\n"); }
+            try { deconnecter(); }
+            catch (Exception ex) { TextAreaReponses.appendText(ex + "\n"); }
         });
 
         try { setServeurUDP(); } catch (Exception ignored) {}
@@ -50,6 +58,7 @@ public class HelloController implements Initializable {
         InetAddress inetAddress = InetAddress.getByName("224.0.0.250");
         int portTCP = 5555, portUDP = 5556;
         byte ttl = 60;
+
         byte[] data = "Tu es qui?".getBytes();
         byte[] bufferResponse = new byte[512];
 
@@ -58,12 +67,14 @@ public class HelloController implements Initializable {
         DatagramPacket dpResponse = new DatagramPacket(bufferResponse, bufferResponse.length);
 
         new Thread(() -> {
-            try { dsResponse.receive(dpResponse); } catch (IOException ignored) {}
+            try { dsResponse.receive(dpResponse); }
+            catch (IOException ignored) {}
         }).start();
 
         ms.setTimeToLive(ttl);
         DatagramPacket dp = new DatagramPacket(data, data.length, inetAddress, portTCP);
         ms.send(dp);
+
         Thread.sleep(100);
         ms.close();
 
@@ -74,8 +85,10 @@ public class HelloController implements Initializable {
     private void recupererDesParametres(DatagramPacket dp) {
         String s = new String(dp.getData(), 0, dp.getLength());
         String[] p = s.split(";");
-        TextFieldIP.setText(p[0]);
-        TextFieldPort.setText(p[1]);
+        if (p.length >= 2) {
+            TextFieldIP.setText(p[0]);
+            TextFieldPort.setText(p[1]);
+        }
     }
 
     private void envoyer() throws IOException {
@@ -94,10 +107,11 @@ public class HelloController implements Initializable {
     private void connecter() throws Exception {
         adresse = TextFieldIP.getText();
         port = TextFieldPort.getText();
+
         if (!adresse.isEmpty() && !port.isEmpty()) {
             InetAddress host = InetAddress.getByName(adresse);
 
-
+            // Ici tu choisis le mode : NONE / ECB / CBC
             tcp = new TCP(host, Integer.parseInt(port), this, CryptoClient.Mode.CBC);
 
             tcp.connection();

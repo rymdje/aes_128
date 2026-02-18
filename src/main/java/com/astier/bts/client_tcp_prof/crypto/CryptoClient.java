@@ -1,4 +1,4 @@
-package
+package com.astier.bts.client_tcp_prof.crypto;
 
 import com.astier.bts.aes.Aes_cbc;
 import com.astier.bts.aes.Aes_ecb;
@@ -9,6 +9,7 @@ import com.astier.bts.configuration.Record_config;
 import java.nio.charset.StandardCharsets;
 
 public class CryptoClient {
+
     public enum Mode { NONE, ECB, CBC }
 
     private final Mode mode;
@@ -17,20 +18,28 @@ public class CryptoClient {
 
     public CryptoClient(Mode mode) {
         this.mode = mode;
-        if (mode == Mode.NONE) { aesEcb = null; aesCbc = null; return; }
+
+        if (mode == Mode.NONE) {
+            aesEcb = null;
+            aesCbc = null;
+            return;
+        }
 
         int formatAESKey = 32, formatAESIV = 16;
+
         Record_config cfg = Configuration_json.init();
         if (cfg == null) throw new IllegalStateException("configuration_json.json introuvable");
 
         byte[] key = Outils.normalizeChaine(cfg.motDePasse(), formatAESKey);
-        byte[] iv  = Outils.normalizeChaine(cfg.iv(),         formatAESIV);
+        byte[] iv  = Outils.normalizeChaine(cfg.iv(), formatAESIV);
 
         aesEcb = (mode == Mode.ECB) ? new Aes_ecb(formatAESKey, key) : null;
-        aesCbc = (mode == Mode.CBC) ? new Aes_cbc(key, iv)          : null;
+        aesCbc = (mode == Mode.CBC) ? new Aes_cbc(key, iv) : null;
     }
 
-    public boolean enabled() { return mode != Mode.NONE; }
+    public boolean enabled() {
+        return mode != Mode.NONE;
+    }
 
     public byte[] encrypt(String clearText) {
         byte[] plain = clearText.getBytes(StandardCharsets.UTF_8);
@@ -44,6 +53,7 @@ public class CryptoClient {
         if (mode == Mode.ECB) plain = aesEcb.decryptage(cipher);
         else if (mode == Mode.CBC) plain = aesCbc.decryptage(cipher);
         else plain = cipher;
+
         return new String(plain, StandardCharsets.UTF_8);
     }
 }
